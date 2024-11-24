@@ -39,7 +39,7 @@ class Loader(object):
         
         for ticker in list_of_tickers:
         # Call get_daily_from_yahoo for each ticker
-            df = self.get_daily_from_yahoo(ticker, self.opt.start_date, "2024-10-08")
+            df = self.get_daily_from_yahoo(ticker, self.opt.start_date, self.opt.end_date)
             if df is not None:
                 # Save the DataFrame to a CSV file in the output_dir
                 output_file = os.path.join(self.opt.output_dir, f"{ticker}_daily.csv")
@@ -211,7 +211,7 @@ def run():
         list_of_tickers = list(df['Symbol'])
         print(f"Read tickers from {fname}")
 
-    print(list_of_tickers)
+    # print(list_of_tickers)
     print(opt.start_date, opt.end_date)
 
     db_file = opt.sqlite_db
@@ -221,9 +221,9 @@ def run():
     print(f"Download data to {opt.data_dir} directory")
 
     # Turn the flag from 1 to 0 after you are done with testing for faster development
-    if 0:
-        # download data to csv files
-        loader.download_data_to_csv(list_of_tickers)
+    # if 0:
+    #     # download data to csv files
+    #     loader.download_data_to_csv(list_of_tickers)
 
     if 0:
         loader.save_daily_data_to_sqlite(opt.output_dir, list_of_tickers)

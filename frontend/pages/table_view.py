@@ -42,9 +42,9 @@ layout = html.Div([
 app = get_app()
 @app.callback(
     Output("stock_table", "data"),
-    [Input("min_rsi", "value"), Input("max_rsi", "value")]
+    [Input("min_rsi", "value"), Input("max_rsi", "value"), Input("macd_signal", "value")]
 )
-def filter_table(min_rsi, max_rsi):
+def filter_table(min_rsi, max_rsi, macd_signal):
     # SQL query with filtering conditions
     query = '''
     SELECT AsOfDate, Ticker, Close, Volume, SMA10, SMA20, SMA50, SMA200, RSI, MACDline, MACDsignal
@@ -63,10 +63,18 @@ def filter_table(min_rsi, max_rsi):
         filters.append("RSI <= ?")
         parameters.append(max_rsi)
     
+    # MACD
+    if macd_signal == "bullish_crossover":
+        filters.append("MACDline > MACDsignal")
+    elif macd_signal == "bearish_crossover":
+        filters.append("MACDline < MACDsignal")
+    elif macd_signal == "bullish_divergence":
+        filters.append("MACDline - MACDsignal > 0 AND Ticker IN (SELECT Ticker FROM EquityTechnicalIndicators WHERE Close < MACDline)")
+    elif macd_signal == "bearish_divergence":
+        filters.append("MACDline - MACDsignal < 0 AND Ticker IN (SELECT Ticker FROM EquityTechnicalIndicators WHERE Close > MACDline)")
+    
     if filters:
         query += " AND " + " AND ".join(filters)
-
-
 
     # Execute the query
     conn = connect_to_db("data/sqlite/Equity.db")
