@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  stock-screener:
+    build:
+      context: .
+      dockerfile: config/Dockerfile  # Specify Dockerfile location
+    ports:
+      - "8050:8050"  # Map container port 8050 to localhost
+    volumes:
+      - ./frontend:/app/frontend   # Mount frontend code for live updates
+      - ./backend:/app/backend     # Mount backend code for live updates
+      - ./config:/app/config       # Mount config folder
+    environment:
+      - VIRTUAL_ENV=/app/venv      # Set virtual environment path
+    command: bash -c "source /app/venv/bin/activate && pip install --upgrade -r requirements.txt && python frontend/app.py"

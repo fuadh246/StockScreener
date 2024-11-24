@@ -1,0 +1,9 @@
+name: Update SQLite Database
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs daily at midnight UTC
+
+jobs:
+  update-database:
+    runs-on: ubuntu-latest

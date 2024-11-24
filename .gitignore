@@ -1,0 +1,25 @@
+# Ignore SQLite database
+data/*.db
+
+# Ignore Python cache files
+*.pyc
+__pycache__/
+
+# Ignore environment variables file
+config/.env
+
+# Ignore logs
+*.log
+
+# Ignore virtual environments
+venv/
+env/
+
+# Ignore Docker artifacts
+*.env
+*.pid
+docker-compose.override.yml
+
+# Ignore IDE files
+.vscode/
+.idea/
