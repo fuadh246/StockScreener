@@ -221,11 +221,11 @@ def run():
     print(f"Download data to {opt.data_dir} directory")
 
     # Turn the flag from 1 to 0 after you are done with testing for faster development
-    # if 0:
-    #     # download data to csv files
-    #     loader.download_data_to_csv(list_of_tickers)
+    if 1:
+        # download data to csv files
+        loader.download_data_to_csv(list_of_tickers)
 
-    if 0:
+    if 1:
         loader.save_daily_data_to_sqlite(opt.output_dir, list_of_tickers)
 
     if 1:

@@ -27,3 +27,4 @@ docker-compose.override.yml
 # ignore data
 
 data/sqlite
+data/daily
