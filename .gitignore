@@ -23,3 +23,7 @@ docker-compose.override.yml
 # Ignore IDE files
 .vscode/
 .idea/
+
+# ignore data
+
+data/sqlite

@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy application files into the container
 COPY . /app
-
+RUN pip freeze > requirements.txt
 # Install dependencies from requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
