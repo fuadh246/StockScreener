@@ -83,5 +83,9 @@ def filter_table(min_rsi, max_rsi, macd_signal):
         conn.close()  # Close the connection
         if "Ticker" in filtered_data.columns:
             filtered_data = filtered_data.sort_values(by="Ticker")
+        if not filtered_data.empty:
+            filtered_data["Ticker"] = filtered_data["Ticker"].apply(
+                lambda ticker: f"[{ticker}](/stock/{ticker})"
+            )
         return filtered_data.to_dict("records")
     return []

@@ -9,9 +9,21 @@ def create_stock_table(data):
     if "Ticker" in data.columns:
         data = data.sort_values(by="Ticker")
     
+    
+    # covert to link
+    data["Ticker"] = data["Ticker"].apply(lambda ticker : f"[{ticker}](/stock/{ticker})")
+    
+    
     return dash_table.DataTable(
         id="stock_table",
-        columns=[{"name": col, "id": col} for col in data.columns],
+        columns=[
+            {
+                "name": col,
+                "id": col,
+                "presentation": "markdown" if col == "Ticker" else None,
+            }
+            for col in data.columns
+        ],
         data=data.to_dict("records"),  # Use the updated DataFrame here
         style_table={"overflowX": "auto", "padding": "10px"},
         style_header={

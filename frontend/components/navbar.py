@@ -8,7 +8,7 @@ def create_navbar():
             # Navigation Links
             html.Div([
                 dcc.Link("Table View", href="/", style={"color": "white", "marginRight": "10px"}),
-                dcc.Link("Stock Graph", href="/graph", style={"color": "white"}),
+                dcc.Link("Stock Graph", href="/stock", style={"color": "white"}),
             ], style={"textAlign": "center", "marginBottom": "20px"}),
 
             # RSI Inputs
