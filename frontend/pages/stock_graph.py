@@ -6,6 +6,8 @@ from dash import register_page
 from backend.database import connect_to_db, read_query_as_dataframe
 from components.navbar import create_navbar
 from datetime import datetime, timedelta
+from plotly.subplots import make_subplots
+
 
 
 register_page(__name__, path_template="/stock/<ticker>")
@@ -53,30 +55,82 @@ def stock_details_page(ticker):
             html.H3(f"No data found for ticker {ticker}", style={"textAlign": "center"}),
         ], style={"marginLeft": "270px", "padding": "20px"})
 
-    # Generate the stock price graph
-    fig = go.Figure(data=[go.Candlestick(
+    stock_data['RSI'] = stock_data_TA['RSI']
+    fig = make_subplots(
+        rows=2, cols=1, shared_xaxes=True, 
+        vertical_spacing=0.3, 
+        row_heights=[2, 1],  
+    )
+
+    # add candlestick chart
+    fig.add_trace(go.Candlestick(
         x=stock_data['AsOfDate'],
         open=stock_data['Open'],
         high=stock_data['High'],
         low=stock_data['Low'],
         close=stock_data['Close'],
-        name='Candlestick'
-    )])
-    # Adding interactive range sliders
+        name='Candlestick',
+        hoverinfo="x+y"
+    ), row=1, col=1)
+
+    # add RSI line chart with threshold
+    fig.add_trace(go.Scatter(
+        x=stock_data['AsOfDate'],
+        y=stock_data['RSI'],
+        mode='lines',
+        name='RSI',
+        line=dict(color='blue')
+    ), row=2, col=1)
+
+    # add RSI thresholds
+    fig.add_trace(go.Scatter(
+        x=stock_data['AsOfDate'],
+        y=[70] * len(stock_data),
+        mode='lines',
+        name='Overbought (70)',
+        line=dict(color='red', dash='dot'),
+        showlegend=True
+    ), row=2, col=1)
+
+    fig.add_trace(go.Scatter(
+        x=stock_data['AsOfDate'],
+        y=[30] * len(stock_data),
+        mode='lines',
+        name='Oversold (30)',
+        line=dict(color='green', dash='dot'),
+        showlegend=True
+    ), row=2, col=1)
+
     fig.update_layout(
-        title='Stock Candlestick Chart',
-        xaxis_title='AsOfDate',
+        autosize=True,  
+        height=None,   
+        width=None,    
         yaxis_title='Price',
-        xaxis_rangeslider_visible=True,  # Range slider enabled
-        xaxis_range=[stock_data['AsOfDate'].min(), stock_data['AsOfDate'].max()],  # Default to full range
+        xaxis2_title='Date', 
+        yaxis2_title='RSI',
+        xaxis_rangeslider_visible=True,
+        xaxis_range=[stock_data['AsOfDate'].min(), stock_data['AsOfDate'].max()],
+        hovermode="x unified", 
+        font=dict(size=14), 
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
     )
-    
 
     # page layout
     return html.Div([
         create_navbar(),
         html.H3(f"Stock Details for {ticker}", style={"textAlign": "center"}),
-        dcc.Graph(figure=fig)
+        # dcc.Graph(figure=fig)
+        dcc.Graph(
+            id="stock-graph",
+            figure=fig,
+            style={"width": "100%", "height": "calc(100vh - 50px)"}  
+        )
     ], style={"marginLeft": "270px", "padding": "20px"})
 
 
@@ -85,12 +139,12 @@ layout = html.Div([
     html.Div(id="stock-details-content")
 ])
 
-# Callback to dynamically update the page content
+
 app = get_app()
 
 @app.callback(
     Output("stock-details-content", "children"),
-    Input("url", "pathname")  # Listen to changes in the URL
+    Input("url", "pathname")  # listen to changes in the URL
 )
 def update_stock_page(pathname):
     """
@@ -101,3 +155,4 @@ def update_stock_page(pathname):
     
     ticker = pathname.split("/")[-1]  # Extract the ticker from the URL
     return stock_details_page(ticker)
+
