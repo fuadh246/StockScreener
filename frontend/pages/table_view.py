@@ -36,16 +36,21 @@ layout = html.Div([
     create_navbar(),
     html.H3(f"Stock Data of {stock_data['AsOfDate'][0]}", style={"textAlign": "center"}),
     create_stock_table(stock_data)
-],style={"marginLeft": "270px", "padding": "20px"})
+],style={"marginLeft": "270px", "padding": "20px" })
 
-# Use get_app() to fetch the app context
 app = get_app()
 @app.callback(
     Output("stock_table", "data"),
-    [Input("min_rsi", "value"), Input("max_rsi", "value"), Input("macd_signal", "value")]
+    [
+        Input("min_rsi", "value"), Input("max_rsi", "value"),
+        Input("macd_signal", "value"),
+        Input("SMA10_condition", "value"),
+        Input("SMA20_condition", "value"),
+        Input("SMA50_condition", "value"),
+        Input("SMA200_condition", "value"),
+    ]
 )
-def filter_table(min_rsi, max_rsi, macd_signal):
-    # SQL query with filtering conditions
+def filter_table(min_rsi, max_rsi, macd_signal, SMA10_condition, SMA20_condition, SMA50_condition, SMA200_condition):
     query = '''
     SELECT AsOfDate, Ticker, Close, Volume, SMA10, SMA20, SMA50, SMA200, RSI, MACDline, MACDsignal
     FROM EquityTechnicalIndicators
@@ -53,17 +58,16 @@ def filter_table(min_rsi, max_rsi, macd_signal):
     '''
     filters = []
     parameters = []
-    
-    # RSI
+
+    # RSI 
     if min_rsi is not None:
         filters.append("RSI >= ?")
         parameters.append(min_rsi)
-        
     if max_rsi is not None:
         filters.append("RSI <= ?")
         parameters.append(max_rsi)
-    
-    # MACD
+
+    # MACD 
     if macd_signal == "bullish_crossover":
         filters.append("MACDline > MACDsignal")
     elif macd_signal == "bearish_crossover":
@@ -72,7 +76,27 @@ def filter_table(min_rsi, max_rsi, macd_signal):
         filters.append("MACDline - MACDsignal > 0 AND Ticker IN (SELECT Ticker FROM EquityTechnicalIndicators WHERE Close < MACDline)")
     elif macd_signal == "bearish_divergence":
         filters.append("MACDline - MACDsignal < 0 AND Ticker IN (SELECT Ticker FROM EquityTechnicalIndicators WHERE Close > MACDline)")
-    
+
+    # SMA 
+    sma_conditions = {
+        "SMA10": SMA10_condition,
+        "SMA20": SMA20_condition,
+        "SMA50": SMA50_condition,
+        "SMA200": SMA200_condition,
+    }
+    for sma, condition in sma_conditions.items():
+        if condition == "above_close":
+            filters.append(f"{sma} > Close")
+        elif condition == "below_close":
+            filters.append(f"{sma} < Close")
+        elif condition and "above_SMA" in condition:
+            comparison_sma = condition.split("_")[1]  
+            filters.append(f"{sma} > {comparison_sma}")
+        elif condition and "below_SMA" in condition:
+            comparison_sma = condition.split("_")[1] 
+            filters.append(f"{sma} < {comparison_sma}")
+
+    # Append filters to query
     if filters:
         query += " AND " + " AND ".join(filters)
 
