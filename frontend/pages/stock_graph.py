@@ -4,7 +4,7 @@ from dash import html, dcc, Input, Output, get_app
 import plotly.graph_objects as go
 from dash import register_page
 from backend.database import connect_to_db, read_query_as_dataframe
-from components.navbar import create_navbar
+# from components.navbar import create_navbar
 from datetime import datetime, timedelta
 from plotly.subplots import make_subplots
 
@@ -51,15 +51,15 @@ def stock_details_page(ticker):
 
     if stock_data.empty:
         return html.Div([
-            create_navbar(),
+            # create_navbar(),
             html.H3(f"No data found for ticker {ticker}", style={"textAlign": "center"}),
         ], style={"marginLeft": "270px", "padding": "20px"})
 
     stock_data['RSI'] = stock_data_TA['RSI']
     fig = make_subplots(
-        rows=2, cols=1, shared_xaxes=True, 
-        vertical_spacing=0.3, 
-        row_heights=[2, 1],  
+        rows=3, cols=1, shared_xaxes=True, 
+        vertical_spacing=0.2, 
+        row_heights=[2, 1, 1],  # Adjusted row heights: Candlestick 2/4, RSI 1/4, MACD 1/4
     )
 
     # add candlestick chart
@@ -72,6 +72,20 @@ def stock_details_page(ticker):
         name='Candlestick',
         hoverinfo="x+y"
     ), row=1, col=1)
+
+    # add SMA
+    sma_columns = ['SMA10', 'SMA20', 'SMA50', 'SMA200']
+    sma_colors = {'SMA10': 'blue', 'SMA20': 'orange', 'SMA50': 'green', 'SMA200': 'red'}
+
+    for sma in sma_columns:
+        if sma in stock_data_TA:  # Check if SMA column exists in the data
+            fig.add_trace(go.Scatter(
+                x=stock_data['AsOfDate'],
+                y=stock_data_TA[sma],
+                mode='lines',
+                name=sma,
+                line=dict(color=sma_colors[sma], width=1.5)
+            ), row=1, col=1)
 
     # add RSI line chart with threshold
     fig.add_trace(go.Scatter(
@@ -101,13 +115,32 @@ def stock_details_page(ticker):
         showlegend=True
     ), row=2, col=1)
 
+    # MACD 
+    fig.add_trace(go.Scatter(
+        x=stock_data['AsOfDate'],
+        y=stock_data_TA['MACDline'],
+        mode='lines',
+        name='MACDline',
+        line=dict(color='green'),
+        showlegend=True
+    ), row=3, col=1)
+    fig.add_trace(go.Scatter(
+        x=stock_data['AsOfDate'],
+        y=stock_data_TA['MACDsignal'],
+        mode='lines',
+        name='MACDsignal',
+        line=dict(color='red',),
+        showlegend=True
+    ), row=3, col=1)
+
     fig.update_layout(
         autosize=True,  
         height=None,   
         width=None,    
         yaxis_title='Price',
-        xaxis2_title='Date', 
         yaxis2_title='RSI',
+        yaxis3_title='MACD',
+        xaxis3_title='Date', 
         xaxis_rangeslider_visible=True,
         xaxis_range=[stock_data['AsOfDate'].min(), stock_data['AsOfDate'].max()],
         hovermode="x unified", 
@@ -123,9 +156,7 @@ def stock_details_page(ticker):
 
     # page layout
     return html.Div([
-        create_navbar(),
         html.H3(f"Stock Details for {ticker}", style={"textAlign": "center"}),
-        # dcc.Graph(figure=fig)
         dcc.Graph(
             id="stock-graph",
             figure=fig,

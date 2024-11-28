@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 from dash import html, Input, Output, get_app
 from components.stock_table import create_stock_table
-from components.navbar import create_navbar
+# from components.navbar import create_navbar
 from backend.database import connect_to_db, read_query_as_dataframe
 from dash import register_page
 register_page(__name__, path="/")
@@ -33,7 +33,7 @@ stock_data = get_initial_data()
     
 # Page Layout
 layout = html.Div([
-    create_navbar(),
+    # create_navbar(),
     html.H3(f"Stock Data of {stock_data['AsOfDate'][0]}", style={"textAlign": "center"}),
     create_stock_table(stock_data)
 ],style={"marginLeft": "270px", "padding": "20px" })
