@@ -1,13 +1,11 @@
 import sqlite3
 import pandas as pd
-from dash import html, dcc, Input, Output, get_app
-import plotly.graph_objects as go
 from dash import register_page
-from backend.database import connect_to_db, read_query_as_dataframe
+import plotly.graph_objects as go
 from datetime import datetime, timedelta
 from plotly.subplots import make_subplots
-
-
+from dash import html, dcc, Input, Output, get_app
+from backend.database import connect_to_db, read_query_as_dataframe
 
 register_page(__name__, path_template="/stock/<ticker>")
 DB_PATH = "data/sqlite/Equity.db"
@@ -165,7 +163,7 @@ def stock_details_page(ticker):
 
 
 layout = html.Div([
-    dcc.Location(id="url"),  # Add the URL component
+    dcc.Location(id="url"),
     html.Div(id="stock-details-content")
 ])
 
@@ -183,6 +181,6 @@ def update_stock_page(pathname):
     if not pathname:
         return html.Div("No stock selected.", style={"textAlign": "center", "padding": "20px"})
     
-    ticker = pathname.split("/")[-1]  # Extract the ticker from the URL
+    ticker = pathname.split("/")[-1] # gets the ticker
     return stock_details_page(ticker)
 

@@ -1,10 +1,10 @@
-from dash import html, dcc, Input, Output, get_app, register_page
+from dash import html
 
 def display_error_message(pathname):
         return html.Div([
             html.H1("⚠️ Error: Missing Ticker", style={"color": "red", "textAlign": "center"}),
             html.P(
-                "It seems like you navigated to '/stock' without providing a ticker.",
+                "It seems like you navigated to an unknown page without providing a ticker.",
                 style={"textAlign": "center", "fontSize": "18px"}
             ),
             html.P(
@@ -12,7 +12,7 @@ def display_error_message(pathname):
                 style={"textAlign": "center", "fontSize": "16px"}
             ),
             html.A(
-                "Go Back to Homepage",
+                "🏠 Go Back to Homepage",
                 href="/",
                 style={
                     "display": "block",

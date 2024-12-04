@@ -1,4 +1,5 @@
 from dash import dash_table
+
 def create_stock_table(data):
     # drop the "AsOfDate" column before
     if "AsOfDate" in data.columns:
