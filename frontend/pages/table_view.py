@@ -2,13 +2,12 @@ import sqlite3
 import pandas as pd
 from dash import html, Input, Output, get_app
 from components.stock_table import create_stock_table
-# from components.navbar import create_navbar
 from backend.database import connect_to_db, read_query_as_dataframe
 from dash import register_page
 register_page(__name__, path="/")
 DB_PATH = "data/sqlite/Equity.db"
 
-# Get data from sqlite
+# get data from sqlite
 # connect to database
 def connect_to_db(path):
     try:
@@ -31,7 +30,7 @@ def get_initial_data():
 
 stock_data = get_initial_data()
     
-# Page Layout
+# page Layout
 layout = html.Div([
     # create_navbar(),
     html.H3(f"Stock Data of {stock_data['AsOfDate'][0]}", style={"textAlign": "center"}),

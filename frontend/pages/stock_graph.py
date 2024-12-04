@@ -4,7 +4,6 @@ from dash import html, dcc, Input, Output, get_app
 import plotly.graph_objects as go
 from dash import register_page
 from backend.database import connect_to_db, read_query_as_dataframe
-# from components.navbar import create_navbar
 from datetime import datetime, timedelta
 from plotly.subplots import make_subplots
 
@@ -59,7 +58,7 @@ def stock_details_page(ticker):
     fig = make_subplots(
         rows=3, cols=1, shared_xaxes=True, 
         vertical_spacing=0.2, 
-        row_heights=[2, 1, 1],  # Adjusted row heights: Candlestick 2/4, RSI 1/4, MACD 1/4
+        row_heights=[2, 1, 1],
     )
 
     # add candlestick chart
@@ -78,7 +77,7 @@ def stock_details_page(ticker):
     sma_colors = {'SMA10': 'blue', 'SMA20': 'orange', 'SMA50': 'green', 'SMA200': 'red'}
 
     for sma in sma_columns:
-        if sma in stock_data_TA:  # Check if SMA column exists in the data
+        if sma in stock_data_TA: 
             fig.add_trace(go.Scatter(
                 x=stock_data['AsOfDate'],
                 y=stock_data_TA[sma],

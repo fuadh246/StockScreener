@@ -1,23 +1,6 @@
 from dash import html, dcc, Input, Output, get_app, register_page
 
-# Register the page
-register_page(__name__, path_template="/stock")
-
-# Layout
-layout = html.Div([
-    dcc.Location(id="url"),
-    html.Div(id="stock-error-message", children="") 
-])
-
-
-app = get_app()
-
-@app.callback(
-    Output("stock-error-message", "children"),
-    Input("url", "pathname")
-)
 def display_error_message(pathname):
-    if pathname == "/stock" or not pathname:
         return html.Div([
             html.H1("⚠️ Error: Missing Ticker", style={"color": "red", "textAlign": "center"}),
             html.P(
@@ -48,4 +31,3 @@ def display_error_message(pathname):
             "width": "60%",
             "backgroundColor": "#ffe6e6"
         })
-    return ""
